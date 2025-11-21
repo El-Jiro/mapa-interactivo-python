@@ -21,9 +21,19 @@ tres argumentos en su constructor: una coordenada en forma de lista o tupla, un 
 se mostrará al hacer clic en el marcador y un objeto folium.Icon, en cuyo constructor podemos especificar de manera 
 opcional un nombre de color, si no especificamos ninguno será azul por defecto
 """
-my_marker = folium.Marker(location=[38.2, -99.1], popup="¡Hola, soy un marcador!", icon=folium.Icon(color="green"))
-fg.add_child(my_marker)
+#my_marker = folium.Marker(location=[38.2, -99.1], popup="¡Hola, soy un marcador!", icon=folium.Icon(color="green"))
+#fg.add_child(my_marker)
+
+"""
+Folium no cuenta con un método específico para añadir marcadores en varias ubicaciones distintas, pero podemos usar
+un bucle for normal iterando sobre una lista con varias listas de coordenadas y en el atributo location del constructor de 
+folium.Marker pasamos el nombre de la variable iteradora:
+"""
+
+for coordinates in [[38.2, -99.1],[39.2, -99.1]]:
+    fg.add_child(folium.Marker(location=coordinates, popup="¡Hola, soy un marcador!", icon=folium.Icon(color="green")))
 
 #Ahora añadimos el featureGroup al mapa
 map.add_child(fg)
+map.add_children
 map.save("map1.html")
