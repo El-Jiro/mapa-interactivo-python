@@ -1,15 +1,6 @@
 import folium
 import pandas as pd
 
-"""
-El método Map de Folium tiene un único argumento obligatrio llamado location, este es una lista con las
-coordenadas (latitud y longitud) que queremos que muestre el mapa al abrirse. Tiene varios otros parámetros
-opcionales como zoom_start que controla el nivel de zoom default y va de 0 a 10, o tiles que define el tipo
-y la apariencia del mapa
-"""
-map = folium.Map(location=[19.22, -98.80], zoom_start=5, tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-attr="OpenTopoMap (CC-BY-SA)")
-
 #Creamos un dataframe de pandas
 data = pd.read_csv("datasources/volcanoes.csv")
 #print(data)
@@ -27,7 +18,30 @@ elevation: list[float] = list(data["ELEV"])
 
 #Y una vez más con el nombre:
 name: list[float] = list(data["NAME"])
-print(f"\n{name}")
+#print(f"\n{name}")
+
+#Creamos una función que reciba la altitud del volcán como parámetro y devuelva un color dependiendo del rango de esta
+def color_generator(elevation: float) -> str:
+    
+    color = ""
+
+    if elevation < 1500:
+        color = "green"
+    elif (elevation>= 1500 and elevation < 3000):
+        color = "orange"
+    else: 
+        color = "red"
+    return color
+
+"""
+El método Map de Folium tiene un único argumento obligatrio llamado location, este es una lista con las
+coordenadas (latitud y longitud) que queremos que muestre el mapa al abrirse. Tiene varios otros parámetros
+opcionales como zoom_start que controla el nivel de zoom default y va de 0 a 10, o tiles que define el tipo
+y la apariencia del mapa
+"""
+map = folium.Map(location=[19.22, -98.80], zoom_start=5, tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+attr="OpenTopoMap (CC-BY-SA)")
+
 
 """
 Es buena práctica crear un objeto FeatureGroup para tener agrupados y accesibles íconos, polígonos y otros
@@ -67,7 +81,8 @@ for lt, ln, el, n in zip(latitude, longitude, elevation, name):
     iframe = folium.IFrame(html=html % (n, n, el), width=200, height=100)
     #En el atributo location, creamos una lista con los dos iteradores
     #En el parámetro popup creamos un objeto homónimo, al cual le pasaremos nuestro iframe en el constructor
-    fg.add_child(folium.Marker(location=[lt, ln], popup=folium.Popup(iframe), icon=folium.Icon(color="green")))
+    print(color_generator(el))
+    fg.add_child(folium.Marker(location=[lt, ln], popup=folium.Popup(iframe), icon=folium.Icon(color=color_generator(el))))
 
 
 #Ahora añadimos el featureGroup al mapa
