@@ -1,4 +1,5 @@
 import folium
+import pandas as pd
 
 """
 El método Map de Folium tiene un único argumento obligatrio llamado location, este es una lista con las
@@ -9,9 +10,20 @@ y la apariencia del mapa
 map = folium.Map(location=[19.22, -98.80], zoom_start=5, tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
 attr="OpenTopoMap (CC-BY-SA)")
 
+#Creamos un dataframe de pandas
+data = pd.read_csv("datasources/volcanoes.csv")
+#print(data)
+
+#obtenemos los datos de las columnas LAT y LON y las guardamos en listas nativas de python
+latitude: list[float] = list(data["LAT"])
+#print( f"\n{latitude}")
+
+longitude: list[float] = list(data["LON"])
+#print(f"\n{longitude}")
+
 """
 Es buena práctica crear un objeto FeatureGroup para tener agrupados y accesibles íconos, polígonos y otros
-elementos en un mismo lugar, además esto será de ayuda cuando queramos añadir una capa de control al mapa.
+elementos en un mismo lugar, además será de ayuda cuando queramos añadir una capa de control al mapa.
 """
 fg = folium.FeatureGroup("MyMap")
 
@@ -25,13 +37,14 @@ opcional un nombre de color, si no especificamos ninguno será azul por defecto
 #fg.add_child(my_marker)
 
 """
-Folium no cuenta con un método específico para añadir marcadores en varias ubicaciones distintas, pero podemos usar
-un bucle for normal iterando sobre una lista con varias listas de coordenadas y en el atributo location del constructor de 
-folium.Marker pasamos el nombre de la variable iteradora:
+Para iterar sobre dos listas al mismo tiempo, deberemos crear dos variables iteradoras y utilizar la función zip, 
+pasándole ambas listas como argumento, de la siguiente forma:
 """
+for lt, ln in zip(latitude, longitude):
+    #En el atributo location, creamos una lista con los dos iteradores
+    fg.add_child(folium.Marker(location=[lt, ln], popup="Hi, I'm a marker!", icon=folium.Icon(color="green")))
 
-for coordinates in [[38.2, -99.1],[39.2, -99.1]]:
-    fg.add_child(folium.Marker(location=coordinates, popup="¡Hola, soy un marcador!", icon=folium.Icon(color="green")))
+
 
 #Ahora añadimos el featureGroup al mapa
 map.add_child(fg)
