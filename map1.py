@@ -21,11 +21,33 @@ latitude: list[float] = list(data["LAT"])
 longitude: list[float] = list(data["LON"])
 #print(f"\n{longitude}")
 
+#Repetimos el procedimiento con la columna ELEV
+elevation: list[float] = list(data["ELEV"])
+#print(f"\n{longitude}")
+
+#Y una vez más con el nombre:
+name: list[float] = list(data["NAME"])
+print(f"\n{name}")
+
 """
 Es buena práctica crear un objeto FeatureGroup para tener agrupados y accesibles íconos, polígonos y otros
 elementos en un mismo lugar, además será de ayuda cuando queramos añadir una capa de control al mapa.
 """
 fg = folium.FeatureGroup("MyMap")
+
+#Podemos usar código HTML para estilizar mejor el texto de los popups: esto nos mostrará el nombre, la altura 
+# y un link para buscar el volcán en google 
+html = """
+<ul>
+    <li>
+        <b>Volcano name:</b>
+        <br><a href="https://www.google.com/search?q=%%22%s%%22" target="_blank">%s</a><br>
+    </li>
+    <li>
+        <b>Height</b>: %s m
+    </li>
+</ul>
+"""
 
 """
 Para crear un marcador llamamos al método add_child del objeto fg y le pasamos un objeto folium.Marker, que recibe
@@ -37,13 +59,15 @@ opcional un nombre de color, si no especificamos ninguno será azul por defecto
 #fg.add_child(my_marker)
 
 """
-Para iterar sobre dos listas al mismo tiempo, deberemos crear dos variables iteradoras y utilizar la función zip, 
-pasándole ambas listas como argumento, de la siguiente forma:
+Para iterar sobre dos o más listas al mismo tiempo, deberemos crear el número correspondiente de variables iteradoras 
+y utilizar la función zip, pasándole todas las listas como argumento, de la siguiente forma:
 """
-for lt, ln in zip(latitude, longitude):
+for lt, ln, el, n in zip(latitude, longitude, elevation, name):
+    #Creamos un objeto iframe y le pasamos nuestro html en el constructor: 
+    iframe = folium.IFrame(html=html % (n, n, el), width=200, height=100)
     #En el atributo location, creamos una lista con los dos iteradores
-    fg.add_child(folium.Marker(location=[lt, ln], popup="Hi, I'm a marker!", icon=folium.Icon(color="green")))
-
+    #En el parámetro popup creamos un objeto homónimo, al cual le pasaremos nuestro iframe en el constructor
+    fg.add_child(folium.Marker(location=[lt, ln], popup=folium.Popup(iframe), icon=folium.Icon(color="green")))
 
 
 #Ahora añadimos el featureGroup al mapa
