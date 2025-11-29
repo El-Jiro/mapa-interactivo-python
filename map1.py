@@ -81,8 +81,8 @@ for lt, ln, el, n in zip(latitude, longitude, elevation, name):
     iframe = folium.IFrame(html=html % (n, n, el), width=200, height=100)
     #En el atributo location, creamos una lista con los dos iteradores
     #En el parámetro popup creamos un objeto homónimo, al cual le pasaremos nuestro iframe en el constructor
-    print(color_generator(el))
-    fg.add_child(folium.Marker(location=[lt, ln], popup=folium.Popup(iframe), icon=folium.Icon(color=color_generator(el))))
+    fg.add_child(folium.CircleMarker(location=[lt, ln], fill=True, popup=folium.Popup(iframe), radius=5, weight=2, 
+                                    color="black", fill_color=color_generator(el), fill_opacity= 0.8))
 
 
 #Ahora añadimos el featureGroup al mapa
