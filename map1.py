@@ -42,10 +42,11 @@ map = folium.Map(location=[19.22, -98.80], zoom_start=5, tiles="cartodbpositron"
 
 
 """
-Es buena práctica crear un objeto FeatureGroup para tener agrupados y accesibles íconos, polígonos y otros
-elementos en un mismo lugar, además será de ayuda cuando queramos añadir una capa de control al mapa.
+Crearemos dos featureGroup distintos, una para los volcanes y otro para la población, de esta manera la capa de 
+control nos permitirá activar o desactivar cada una de estas vistas individualmente en vez de hacerlo con ambas a la vez
 """
-fg = folium.FeatureGroup("MyMap")
+fgv = folium.FeatureGroup("Volcanoes")
+fgp = folium.FeatureGroup("Population")
 
 #Podemos usar código HTML para estilizar mejor el texto de los popups: esto nos mostrará el nombre, la altura 
 # y un link para buscar el volcán en google 
@@ -79,7 +80,7 @@ for lt, ln, el, n in zip(latitude, longitude, elevation, name):
     iframe = folium.IFrame(html=html % (n, n, el), width=200, height=100)
     #En el atributo location, creamos una lista con los dos iteradores
     #En el parámetro popup creamos un objeto homónimo, al cual le pasaremos nuestro iframe en el constructor
-    fg.add_child(folium.CircleMarker(location=[lt, ln], fill=True, popup=folium.Popup(iframe), radius=5, weight=2, 
+    fgv.add_child(folium.CircleMarker(location=[lt, ln], fill=True, popup=folium.Popup(iframe), radius=5, weight=2, 
                                     color="black", fill_color=color_generator(el), fill_opacity= 0.8))
 
 """
@@ -91,7 +92,7 @@ Para cambiar el color de relleno de los polígonos, usamos el argumento style_fu
 de la siguiente forma
 """
 
-fg.add_child(folium.GeoJson(data=open(file="datasources/world.json", encoding='utf-8-sig').read(), 
+fgp.add_child(folium.GeoJson(data=open(file="datasources/world.json", encoding='utf-8-sig').read(), 
                             style_function= lambda x: 
                             {"fillColor": "green"} if x["properties"]["POP2005"] < 10000000 
                             else {"fillColor": "orange"} if x["properties"]["POP2005"]>= 10000000 and 
@@ -100,7 +101,8 @@ fg.add_child(folium.GeoJson(data=open(file="datasources/world.json", encoding='u
 
 
 #Ahora añadimos el featureGroup al mapa
-map.add_child(fg)
+map.add_child(fgv)
+map.add_child(fgp)
 
 """
 IMPORTANTE!!! La capa de control debe añadirse siempre despúes de haber añadido todos los objetos hijos al mapa, 
