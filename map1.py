@@ -101,5 +101,13 @@ fg.add_child(folium.GeoJson(data=open(file="datasources/world.json", encoding='u
 
 #Ahora añadimos el featureGroup al mapa
 map.add_child(fg)
-map.add_children
+
+"""
+IMPORTANTE!!! La capa de control debe añadirse siempre despúes de haber añadido todos los objetos hijos al mapa, 
+de lo contrario nuestra aplicación se bugeará y sólo mostrará el mapa base sin los hijos. Para añadirla invocamos
+al método add_child del mapa y le pasamos como argumento un objeto folium.LayerControl, el cual no recibe ningún 
+parámetro en su constructor
+"""
+map.add_child(folium.LayerControl())
+
 map.save("map1.html")
