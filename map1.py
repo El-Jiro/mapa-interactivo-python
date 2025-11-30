@@ -22,25 +22,23 @@ name: list[float] = list(data["NAME"])
 
 #Creamos una función que reciba la altitud del volcán como parámetro y devuelva un color dependiendo del rango de esta
 def color_generator(elevation: float) -> str:
-    
-    color = ""
 
-    if elevation < 1500:
+    if (elevation < 1500):
         color = "green"
-    elif (elevation>= 1500 and elevation < 3000):
+    elif (elevation >= 1500 and elevation < 3000):
         color = "orange"
     else: 
         color = "red"
+
     return color
 
 """
 El método Map de Folium tiene un único argumento obligatrio llamado location, este es una lista con las
-coordenadas (latitud y longitud) que queremos que muestre el mapa al abrirse. Tiene varios otros parámetros
+coordenadas (latitud y longitud) en donde queremos que se abra el mapa. Tiene varios otros parámetros
 opcionales como zoom_start que controla el nivel de zoom default y va de 0 a 10, o tiles que define el tipo
 y la apariencia del mapa
 """
-map = folium.Map(location=[19.22, -98.80], zoom_start=5, tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
-attr="OpenTopoMap (CC-BY-SA)")
+map = folium.Map(location=[19.22, -98.80], zoom_start=5, tiles="cartodbpositron")
 
 
 """
@@ -83,6 +81,22 @@ for lt, ln, el, n in zip(latitude, longitude, elevation, name):
     #En el parámetro popup creamos un objeto homónimo, al cual le pasaremos nuestro iframe en el constructor
     fg.add_child(folium.CircleMarker(location=[lt, ln], fill=True, popup=folium.Popup(iframe), radius=5, weight=2, 
                                     color="black", fill_color=color_generator(el), fill_opacity= 0.8))
+
+"""
+Añadiremos otro hijo al featureGroup usando el método GeoJson de Folium, al cual le pasaremos en el argumento 'data'
+la función open de python, que a su vez recibe la ruta de nuestro archivo 'world.json", y la codificación del mismo.
+Al final le concatenamos un método read.
+
+Para cambiar el color de relleno de los polígonos, usamos el argumento style_function, al cual le pasaremos una expresión lambda
+de la siguiente forma
+"""
+
+fg.add_child(folium.GeoJson(data=open(file="datasources/world.json", encoding='utf-8-sig').read(), 
+                            style_function= lambda x: 
+                            {"fillColor": "green"} if x["properties"]["POP2005"] < 10000000 
+                            else {"fillColor": "orange"} if x["properties"]["POP2005"]>= 10000000 and 
+                            x["properties"]["POP2005"]<30000000 
+                            else {"fillColor": "red"}))
 
 
 #Ahora añadimos el featureGroup al mapa
